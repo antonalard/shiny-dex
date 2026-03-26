@@ -3,7 +3,9 @@ import requests
 
 def main(page: ft.Page):
     # --- 1. Proffsiga Grundinställningar ---
-    page.title = "Shiny Dex Complete Pro"
+    page.title = "Shinydex"
+    page.favicon = "icon.png"
+    page.web_manifest = "manifest.json"
     page.theme_mode = "dark" 
     page.padding = 20
     page.scroll = "adaptive" 
@@ -161,7 +163,7 @@ def main(page: ft.Page):
 
     # --- 5. Layout ---
     page.add(
-        ft.Row([ft.Text("✨ Shiny Dex", size=28, weight="bold")], alignment="center"),
+        ft.Row([ft.Text("✨ Shinydex", size=28, weight="bold")], alignment="center"),
         search_field,
         ft.ElevatedButton("SÖK", on_click=perform_search, width=400, height=50),
         ft.Divider(),
