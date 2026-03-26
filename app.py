@@ -6,10 +6,11 @@ def main(page: ft.Page):
     page.title = "Shinydex"
     page.favicon = "assets/icon.png"
     page.web_manifest = "assets/manifest.json"
-    page.theme_mode = "dark" 
+    page.theme_mode = "dark"
+    page.bgcolor = "#000000"
     page.padding = 20
-    page.scroll = "adaptive" 
-    
+    page.scroll = "adaptive"
+
     try:
         page.window.width = 420
         page.window.height = 850
@@ -18,62 +19,61 @@ def main(page: ft.Page):
         page.window_height = 850
 
     results_list = ft.Column(spacing=15)
-    
-    # --- 2. Ladda data direkt (HÄR ÄR FIXEN) ---
+
+    # --- 2. Ladda data direkt ---
     all_pokemon_db = {}
     shiny_lookup_db = {}
-    
+
     url_all = "https://pogoapi.net/api/v1/released_pokemon.json"
     url_shiny = "https://pogoapi.net/api/v1/shiny_pokemon.json"
-    
+
     try:
-        # Fyller listorna omedelbart när appen startar
         all_pokemon_db.update(requests.get(url_all).json())
         shiny_lookup_db.update(requests.get(url_shiny).json())
     except Exception as e:
-        results_list.controls.append(ft.Text(f"Kunde inte ladda Pokedex: {e}", color="red", size=16))
+        results_list.controls.append(
+            ft.Text(f"Kunde inte ladda Pokedex: {e}", color="red", size=16)
+        )
 
-    # --- HJÄLPFUNKTIONER FÖR BADGES ---
+    # --- BADGES ---
     def make_method_badge(emoji, text_value):
         return ft.Container(
             content=ft.Text(f"{emoji} {text_value}", color="white", size=13, weight="bold"),
             padding=ft.padding.only(left=12, right=12, top=8, bottom=8),
             bgcolor="#383838",
-            border_radius=20 
+            border_radius=20
         )
 
     def make_no_shiny_badge():
         return ft.Container(
             content=ft.Text("❌ Finns ej som shiny", color="#ff8888", size=13, weight="bold"),
             padding=ft.padding.only(left=12, right=12, top=8, bottom=8),
-            bgcolor="#3a1111", 
-            border_radius=20 
+            bgcolor="#3a1111",
+            border_radius=20
         )
 
-    # --- 3. Söklogiken med Hela Pokedex ---
+    # --- SÖK ---
     def perform_search(e=None):
         results_list.controls.clear()
         query = search_field.value.lower().strip()
-        
+
         if not query:
             page.update()
             return
 
         found_counter = 0
 
-        # Loopa igenom Hela Pokedexen istället för bara shiny-listan
         for p_id, p_info in all_pokemon_db.items():
             name = p_info.get('name', 'Okänd')
-            
+
             if query in name.lower():
                 found_counter += 1
-                
-                # Kolla om denna ID finns i shiny-listan
-                shiny_status = shiny_lookup_db.get(p_id) 
+
+                shiny_status = shiny_lookup_db.get(p_id)
                 shiny_exists = shiny_status is not None
-                
+
                 normal_img_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/{p_id}.png"
-                
+
                 card_content_children = [
                     ft.Row([
                         ft.Text(name, size=22, weight="bold"),
@@ -81,28 +81,27 @@ def main(page: ft.Page):
                     ], alignment="spaceBetween"),
                     ft.Divider(color="grey400"),
                 ]
-                
-                # --- OM DEN KAN VARA SHINY ---
+
                 if shiny_exists:
                     shiny_img_url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/{p_id}.png"
-                    
+
                     card_content_children.append(
                         ft.Row([
                             ft.Column([
                                 ft.Image(src=normal_img_url, width=140, height=140, fit="contain"),
                                 ft.Text("Normal", size=12, color="grey"),
                             ], alignment="center"),
-                            
+
                             ft.Column([
                                 ft.Image(src=shiny_img_url, width=140, height=140, fit="contain"),
                                 ft.Text("Shiny ✨", size=12, color="amber"),
                             ], alignment="center"),
                         ], alignment="center", spacing=10)
                     )
-                    
+
                     card_content_children.append(ft.Divider(color="grey400"))
                     card_content_children.append(ft.Text("Hittas via:", size=14, color="grey400"))
-                    
+
                     badges = []
                     if shiny_status.get('found_wild'): badges.append(make_method_badge("🌿", "Vild"))
                     if shiny_status.get('found_raid'): badges.append(make_method_badge("⚔️", "Raids"))
@@ -111,18 +110,18 @@ def main(page: ft.Page):
                     if shiny_status.get('found_photobomb'): badges.append(make_method_badge("📸", "Photobomb"))
                     if shiny_status.get('found_research'): badges.append(make_method_badge("🔍", "Research"))
                     if not badges: badges.append(make_method_badge("⭐", "Special/Event"))
-                    
+
                     method_rows = ft.Column(spacing=10)
                     current_row = ft.Row(spacing=10)
+
                     for i, badge in enumerate(badges):
                         current_row.controls.append(badge)
                         if len(current_row.controls) == 3 or i == len(badges) - 1:
                             method_rows.controls.append(current_row)
                             current_row = ft.Row(spacing=10)
-                    
+
                     card_content_children.append(method_rows)
-                    
-                # --- OM DEN INTE KAN VARA SHINY ÄN ---
+
                 else:
                     card_content_children.append(
                         ft.Row([
@@ -132,28 +131,30 @@ def main(page: ft.Page):
                             ], alignment="center")
                         ], alignment="center")
                     )
-                    
+
                     card_content_children.append(ft.Divider(color="grey400"))
                     card_content_children.append(
                         ft.Row([make_no_shiny_badge()], alignment="center")
                     )
-                
-                # Lägg in allt i ett kort
+
                 result_card = ft.Container(
                     content=ft.Column(controls=card_content_children, spacing=2),
                     padding=20,
                     border_radius=20,
-                    bgcolor="#212121", 
-                    border=ft.border.all(1, "grey800"), 
+                    bgcolor="#212121",
+                    border=ft.border.all(1, "grey800"),
                 )
+
                 results_list.controls.append(result_card)
-        
+
         if found_counter == 0:
-            results_list.controls.append(ft.Text("Inga träffar hittades i Pokedexen.", color="red", size=16))
+            results_list.controls.append(
+                ft.Text("Inga träffar hittades i Pokedexen.", color="red", size=16)
+            )
 
         page.update()
 
-    # --- 4. Sökfältet ---
+    # --- SÖKFÄLT ---
     search_field = ft.TextField(
         label="Sök Pokémon...",
         prefix_icon="search",
@@ -161,13 +162,34 @@ def main(page: ft.Page):
         on_submit=perform_search
     )
 
-    # --- 5. Layout ---
+    # --- DESIGN / LAYOUT ---
     page.add(
-        ft.Row([ft.Text("✨ Shinydex", size=28, weight="bold")], alignment="center"),
-        search_field,
-        ft.ElevatedButton("SÖK", on_click=perform_search, width=400, height=50),
-        ft.Divider(),
-        results_list
+        ft.Container(
+            expand=True,
+            alignment=ft.alignment.center,
+            content=ft.Stack([
+
+                # Pokeball bakgrund
+                ft.Image(
+                    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
+                    width=300,
+                    opacity=0.15
+                ),
+
+                # Center UI
+                ft.Column(
+                    [
+                        ft.Text("✨ Shinydex", size=28, weight="bold"),
+                        search_field,
+                        ft.ElevatedButton("SÖK", on_click=perform_search, width=300, height=50),
+                        results_list
+                    ],
+                    horizontal_alignment="center",
+                    alignment="center",
+                    spacing=20
+                )
+            ])
+        )
     )
 
 app = ft.run(main, export_asgi_app=True)
