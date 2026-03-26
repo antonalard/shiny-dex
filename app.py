@@ -4,10 +4,8 @@ import requests
 def main(page: ft.Page):
     # --- 1. Proffsiga Grundinställningar ---
     page.title = "Shinydex"
-    page.head = ft.Html("""
-    <link rel="manifest" href="/assets/manifest.json">
-    <link rel="icon" href="/assets/icon.png">
-    """)
+    page.favicon = "assets/icon.png"
+    page.web_manifest = "assets/manifest.json"
     page.theme_mode = "dark" 
     page.padding = 20
     page.scroll = "adaptive" 
