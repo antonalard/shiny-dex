@@ -168,4 +168,3 @@ def main(page: ft.Page):
         results_list
     )
 
-app = ft.run(main, export_asgi_app=True)
