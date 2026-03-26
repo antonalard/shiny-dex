@@ -161,7 +161,7 @@ def main(page: ft.Page):
 
     # --- 5. Layout ---
     page.add(
-        ft.Row([ft.Text("✨ Shiny Dex Complete", size=28, weight="bold")], alignment="center"),
+        ft.Row([ft.Text("✨ Shiny Dex", size=28, weight="bold")], alignment="center"),
         search_field,
         ft.ElevatedButton("SÖK", on_click=perform_search, width=400, height=50),
         ft.Divider(),
