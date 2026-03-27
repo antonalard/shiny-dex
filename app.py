@@ -462,7 +462,7 @@ def main(page: ft.Page):
 
 
 # WEB
-# app = ft.run(main, export_asgi_app=True)
+app = ft.run(main, export_asgi_app=True)
 
 # LOKAL
-ft.app(target=main, assets_dir="assets")
+#ft.app(target=main, assets_dir="assets")
