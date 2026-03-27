@@ -1,302 +1,280 @@
 import flet as ft
-import requests
+
 
 def main(page: ft.Page):
-    # --- 1. Grundinställningar ---
-    page.title = "Shinydex"
-    page.favicon = "assets/icon.png"
-    page.web_manifest = "assets/manifest.json"
-    page.theme_mode = "dark"
-    page.bgcolor = "#000000"
+    page.title = "Shinydex Mockup"
     page.padding = 0
-    page.scroll = "adaptive"
+    page.spacing = 0
+    page.bgcolor = "#000000"
+    page.theme_mode = ft.ThemeMode.DARK
 
-    results_list = ft.Column(spacing=20)
-
-    # --- 2. Ladda data ---
-    all_pokemon_db = {}
-    shiny_lookup_db = {}
-
-    url_all = "https://pogoapi.net/api/v1/released_pokemon.json"
-    url_shiny = "https://pogoapi.net/api/v1/shiny_pokemon.json"
-
-    try:
-        all_pokemon_db.update(requests.get(url_all).json())
-        shiny_lookup_db.update(requests.get(url_shiny).json())
-    except Exception as e:
-        results_list.controls.append(
-            ft.Text(f"Kunde inte ladda Pokedex: {e}", color="red", size=16)
-        )
-
-    # --- BADGES ---
-    def make_method_badge(emoji, text_value):
-        return ft.Container(
-            content=ft.Text(
-                f"{emoji} {text_value}",
-                color="white",
-                size=12,
-                weight="bold",
-            ),
-            padding=ft.padding.only(left=12, right=12, top=8, bottom=8),
-            bgcolor="#1f1f1f",
-            border_radius=20,
-            border=ft.border.all(1, "#2d2d2d"),
-        )
-
-    def make_no_shiny_badge():
-        return ft.Container(
-            content=ft.Text(
-                "❌ Finns ej som shiny",
-                color="#ff9c9c",
-                size=12,
-                weight="bold",
-            ),
-            padding=ft.padding.only(left=12, right=12, top=8, bottom=8),
-            bgcolor="#2a1010",
-            border_radius=20,
-            border=ft.border.all(1, "#4a1d1d"),
-        )
-
-    # --- SÖK ---
-    def perform_search(e=None):
-        results_list.controls.clear()
-        query = search_field.value.lower().strip()
-
-        if not query:
-            page.update()
-            return
-
-        found_counter = 0
-
-        for p_id, p_info in all_pokemon_db.items():
-            name = p_info.get("name", "Okänd")
-
-            if query in name.lower():
-                found_counter += 1
-
-                shiny_status = shiny_lookup_db.get(p_id)
-                shiny_exists = shiny_status is not None
-
-                normal_img_url = (
-                    f"https://raw.githubusercontent.com/PokeAPI/sprites/master/"
-                    f"sprites/pokemon/other/home/{p_id}.png"
-                )
-
-                card_content_children = [
-                    ft.Row(
-                        [
-                            ft.Text(name, size=24, weight="bold", color="white"),
-                            ft.Text(f"ID: {p_id}", color="#8f8f8f", size=14),
-                        ],
-                        alignment="spaceBetween",
-                    ),
-                    ft.Divider(color="#2a2a2a"),
-                ]
-
-                if shiny_exists:
-                    shiny_img_url = (
-                        f"https://raw.githubusercontent.com/PokeAPI/sprites/master/"
-                        f"sprites/pokemon/other/home/shiny/{p_id}.png"
-                    )
-
-                    card_content_children.append(
-                        ft.Row(
-                            [
-                                ft.Column(
-                                    [
-                                        ft.Image(
-                                            src=normal_img_url,
-                                            width=155,
-                                            height=155,
-                                            fit="contain",
-                                        ),
-                                        ft.Text("Normal", size=12, color="#9a9a9a"),
-                                    ],
-                                    alignment="center",
-                                    horizontal_alignment="center",
-                                ),
-                                ft.Column(
-                                    [
-                                        ft.Image(
-                                            src=shiny_img_url,
-                                            width=155,
-                                            height=155,
-                                            fit="contain",
-                                        ),
-                                        ft.Text("Shiny ✨", size=12, color="#ffd966"),
-                                    ],
-                                    alignment="center",
-                                    horizontal_alignment="center",
-                                ),
-                            ],
-                            alignment="center",
-                            spacing=16,
-                        )
-                    )
-
-                    card_content_children.append(ft.Divider(color="#2a2a2a"))
-                    card_content_children.append(
-                        ft.Text("Hittas via:", size=14, color="#9a9a9a")
-                    )
-
-                    badges = []
-                    if shiny_status.get("found_wild"):
-                        badges.append(make_method_badge("🌿", "Vild"))
-                    if shiny_status.get("found_raid"):
-                        badges.append(make_method_badge("⚔️", "Raids"))
-                    if shiny_status.get("found_egg"):
-                        badges.append(make_method_badge("🥚", "Ägg"))
-                    if shiny_status.get("found_evolution"):
-                        badges.append(make_method_badge("🧬", "Utveckling"))
-                    if shiny_status.get("found_photobomb"):
-                        badges.append(make_method_badge("📸", "Photobomb"))
-                    if shiny_status.get("found_research"):
-                        badges.append(make_method_badge("🔍", "Research"))
-                    if not badges:
-                        badges.append(make_method_badge("⭐", "Special/Event"))
-
-                    method_rows = ft.Column(spacing=10)
-                    current_row = ft.Row(spacing=10)
-
-                    for i, badge in enumerate(badges):
-                        current_row.controls.append(badge)
-                        if len(current_row.controls) == 3 or i == len(badges) - 1:
-                            method_rows.controls.append(current_row)
-                            current_row = ft.Row(spacing=10)
-
-                    card_content_children.append(method_rows)
-
-                else:
-                    card_content_children.append(
-                        ft.Row(
-                            [
-                                ft.Column(
-                                    [
-                                        ft.Image(
-                                            src=normal_img_url,
-                                            width=210,
-                                            height=170,
-                                            fit="contain",
-                                        ),
-                                        ft.Text("Normal", size=12, color="#9a9a9a"),
-                                    ],
-                                    alignment="center",
-                                    horizontal_alignment="center",
-                                )
-                            ],
-                            alignment="center",
-                        )
-                    )
-
-                    card_content_children.append(ft.Divider(color="#2a2a2a"))
-                    card_content_children.append(
-                        ft.Row([make_no_shiny_badge()], alignment="center")
-                    )
-
-                result_card = ft.Container(
-                    content=ft.Column(
-                        controls=card_content_children,
-                        spacing=6,
-                    ),
-                    padding=22,
-                    border_radius=24,
-                    bgcolor="#101010dd",
-                    border=ft.border.all(1, "#2a2a2a"),
-                )
-
-                results_list.controls.append(result_card)
-
-        if found_counter == 0:
-            results_list.controls.append(
-                ft.Text(
-                    "Inga träffar hittades i Pokedexen.",
-                    color="#ff7d7d",
-                    size=16,
-                )
-            )
-
-        page.update()
-
-    # --- INPUT ---
     search_field = ft.TextField(
         hint_text="Sök Pokémon...",
         width=340,
+        height=56,
+        border=ft.InputBorder.OUTLINE,
         border_radius=28,
-        bgcolor="#0b0b0bcc",
+        bgcolor="#111111cc",
         color="white",
         text_size=16,
-        content_padding=16,
-        border_color="#2f2f2f",
-        focused_border_color="#ff3b3b",
-        on_submit=perform_search,
+        content_padding=ft.padding.symmetric(horizontal=20, vertical=16),
+        border_color="#333333",
+        focused_border_color="#333333",
+        focused_border_width=1,
+        cursor_color="#ff3b3b",
     )
 
     search_button = ft.ElevatedButton(
         "SÖK",
-        width=340,
-        height=54,
-        on_click=perform_search,
+        width=180,
+        height=46,
         style=ft.ButtonStyle(
-            shape=ft.RoundedRectangleBorder(radius=28),
             bgcolor="#ff3b3b",
             color="white",
-            text_style=ft.TextStyle(size=16, weight="bold"),
+            shape=ft.RoundedRectangleBorder(radius=24),
         ),
     )
 
-    # --- HERO MED RIKTIG BAKGRUND ---
-    hero = ft.Container(
-        height=560,
-        content=ft.Stack(
+    hero_content = ft.Container(
+        height=520,
+        alignment=ft.Alignment.CENTER,
+        content=ft.Column(
             controls=[
-                # Bakgrundsbild
                 ft.Image(
-                    src="assets/bg_groudon.png",
-                    width=1200,
-                    height=560,
-                    fit="cover",
+                    src="shinydex.png",
+                    width=640,
+                    height=220,
+                    fit=ft.BoxFit.CONTAIN,
                 ),
-
-                # Mörk overlay ovanpå bilden
+                ft.Container(height=8),
                 ft.Container(
-                    width=1200,
-                    height=560,
-                    bgcolor="#000000aa",
+                    content=search_field,
+                    padding=8,
+                    bgcolor="#00000055",
+                    border_radius=36,
+                    border=ft.border.all(1, "#ffffff18"),
                 ),
-
-                # Innehåll i mitten
-                ft.Container(
-                    width=1200,
-                    height=560,
-                    content=ft.Column(
-                        controls=[
-                            ft.Text(
-                                "Shinydex",
-                                size=36,
-                                weight="bold",
-                                color="white",
-                                text_align="center",
-                            ),
-                            search_field,
-                            search_button,
-                        ],
-                        alignment="center",
-                        horizontal_alignment="center",
-                        spacing=22,
-                    ),
+                ft.Container(height=6),
+                ft.Row(
+                    controls=[search_button],
+                    alignment=ft.MainAxisAlignment.CENTER,
                 ),
-            ]
-        )
+            ],
+            spacing=6,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            alignment=ft.MainAxisAlignment.CENTER,
+        ),
     )
 
+    def mock_badge(text_value):
+        return ft.Container(
+            content=ft.Text(
+                text_value,
+                color="white",
+                size=11,
+                weight=ft.FontWeight.BOLD,
+            ),
+            padding=ft.padding.symmetric(horizontal=12, vertical=8),
+            bgcolor="#171717cc",
+            border_radius=18,
+            border=ft.border.all(1, "#2a2a2a"),
+        )
+
+    def mock_card(name, pokemon_id, shiny=True):
+        badge_text = "✨ Shiny" if shiny else "—"
+        badge_text_color = "#ffd966" if shiny else "#aaaaaa"
+        badge_bg = "#2a2412cc" if shiny else "#151515cc"
+        badge_border = "#5a4a1a" if shiny else "#2a2a2a"
+
+        right_panel_bg = "#1c1810cc" if shiny else "#141414cc"
+        right_label = "Shiny ✨" if shiny else "Variant"
+        right_label_color = "#ffd966" if shiny else "#bcbcbc"
+
+        return ft.Container(
+            content=ft.Column(
+                controls=[
+                    ft.Row(
+                        controls=[
+                            ft.Column(
+                                controls=[
+                                    ft.Text(
+                                        name,
+                                        size=28,
+                                        weight=ft.FontWeight.BOLD,
+                                        color="white",
+                                    ),
+                                    ft.Text(
+                                        f"ID: {pokemon_id}",
+                                        size=13,
+                                        color="#b8b8b8",
+                                    ),
+                                ],
+                                spacing=2,
+                                expand=True,
+                            ),
+                            ft.Container(
+                                content=ft.Text(
+                                    badge_text,
+                                    size=11,
+                                    color=badge_text_color,
+                                    weight=ft.FontWeight.BOLD,
+                                ),
+                                padding=ft.padding.symmetric(
+                                    horizontal=12,
+                                    vertical=8,
+                                ),
+                                bgcolor=badge_bg,
+                                border_radius=18,
+                                border=ft.border.all(1, badge_border),
+                            ),
+                        ],
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                        vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                    ),
+                    ft.Container(
+                        height=1,
+                        bgcolor="#1f1f1f",
+                        border_radius=10,
+                    ),
+                    ft.Row(
+                        controls=[
+                            ft.Container(
+                                expand=True,
+                                padding=12,
+                                bgcolor="#141414cc",
+                                border_radius=20,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.Container(
+                                            height=165,
+                                            alignment=ft.Alignment.CENTER,
+                                            content=ft.Text(
+                                                "Bild",
+                                                color="#666666",
+                                                size=18,
+                                            ),
+                                        ),
+                                        ft.Text(
+                                            "Normal",
+                                            size=11,
+                                            color="#bcbcbc",
+                                            text_align=ft.TextAlign.CENTER,
+                                        ),
+                                    ],
+                                    spacing=6,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                ),
+                            ),
+                            ft.Container(
+                                expand=True,
+                                padding=12,
+                                bgcolor=right_panel_bg,
+                                border_radius=20,
+                                content=ft.Column(
+                                    controls=[
+                                        ft.Container(
+                                            height=165,
+                                            alignment=ft.Alignment.CENTER,
+                                            content=ft.Text(
+                                                "Bild",
+                                                color="#666666",
+                                                size=18,
+                                            ),
+                                        ),
+                                        ft.Text(
+                                            right_label,
+                                            size=11,
+                                            color=right_label_color,
+                                            text_align=ft.TextAlign.CENTER,
+                                        ),
+                                    ],
+                                    spacing=6,
+                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                ),
+                            ),
+                        ],
+                        spacing=14,
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        wrap=True,
+                    ),
+                    ft.Container(
+                        height=1,
+                        bgcolor="#1f1f1f",
+                        border_radius=10,
+                    ),
+                    ft.Text(
+                        "Mockup-sektion",
+                        size=13,
+                        color="#bdbdbd",
+                    ),
+                    ft.Row(
+                        controls=[
+                            mock_badge("🌿 Vild"),
+                            mock_badge("⚔️ Raids"),
+                            mock_badge("🔍 Research"),
+                        ],
+                        wrap=True,
+                        spacing=10,
+                        run_spacing=10,
+                    ),
+                ],
+                spacing=16,
+            ),
+            padding=24,
+            border_radius=28,
+            bgcolor="#0d0d0dde",
+            border=ft.border.all(1, "#202020"),
+        )
+
     results_section = ft.Container(
-        padding=20,
-        content=results_list,
+        padding=ft.padding.symmetric(horizontal=20, vertical=20),
+        content=ft.Column(
+            controls=[
+                mock_card("Pikachu", "25", shiny=True),
+                mock_card("Mewtwo", "150", shiny=False),
+                mock_card("Charizard", "6", shiny=True),
+                mock_card("Gengar", "94", shiny=True),
+                mock_card("Lucario", "448", shiny=False),
+                mock_card("Rayquaza", "384", shiny=True),
+            ],
+            spacing=18,
+        ),
+    )
+
+    scroll_content = ft.Column(
+        controls=[
+            hero_content,
+            results_section,
+            ft.Container(height=24),
+        ],
+        spacing=0,
+        scroll=ft.ScrollMode.ADAPTIVE,
+        expand=True,
     )
 
     page.add(
-        hero,
-        results_section,
+        ft.Stack(
+            controls=[
+                ft.Container(
+                    expand=True,
+                    image=ft.DecorationImage(
+                        src="bg_groudon.png",
+                        fit=ft.BoxFit.COVER,
+                        opacity=0.48,
+                    ),
+                ),
+                ft.Container(
+                    expand=True,
+                    bgcolor="#000000eb",
+                ),
+                ft.SafeArea(
+                    content=scroll_content,
+                    expand=True,
+                ),
+            ],
+            expand=True,
+        )
     )
 
-app = ft.run(main, export_asgi_app=True)
+
+ft.app(target=main, assets_dir="assets")
