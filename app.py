@@ -187,15 +187,18 @@ def main(page: ft.Page):
             )
 
             card_body = ft.Column(
-                controls=[
-                    header,
-                    build_divider(),
-                    image_section,
-                    build_divider(),
-                    methods_section,
-                ],
-                spacing=16,
-            )
+    controls=[
+        header,
+        build_divider(),
+        ft.Row(
+            controls=[image_section],
+            alignment=ft.MainAxisAlignment.CENTER,
+        ),
+        build_divider(),
+        methods_section,
+    ],
+    spacing=16,
+)
         else:
             image_section = ft.Column(
                 controls=[
@@ -224,18 +227,21 @@ def main(page: ft.Page):
             )
 
             card_body = ft.Column(
-                controls=[
-                    header,
-                    build_divider(),
-                    image_section,
-                    build_divider(),
-                    ft.Row(
-                        controls=[make_no_shiny_badge()],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                    ),
-                ],
-                spacing=16,
-            )
+    controls=[
+        header,
+        build_divider(),
+        ft.Row(
+            controls=[image_section],
+            alignment=ft.MainAxisAlignment.CENTER,
+        ),
+        build_divider(),
+        ft.Row(
+            controls=[make_no_shiny_badge()],
+            alignment=ft.MainAxisAlignment.CENTER,
+        ),
+    ],
+    spacing=16,
+)
 
         return ft.Container(
             content=card_body,
