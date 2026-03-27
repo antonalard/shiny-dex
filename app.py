@@ -277,4 +277,5 @@ def main(page: ft.Page):
     )
 
 
-ft.app(target=main, assets_dir="assets")
+
+app = ft.run(main, export_asgi_app=True)
