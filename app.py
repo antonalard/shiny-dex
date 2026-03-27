@@ -1,9 +1,8 @@
 import flet as ft
 import requests
 
-
 def main(page: ft.Page):
-    # --- 1. Proffsiga Grundinställningar ---
+    # --- 1. Grundinställningar ---
     page.title = "Shinydex"
     page.favicon = "assets/icon.png"
     page.web_manifest = "assets/manifest.json"
@@ -201,7 +200,7 @@ def main(page: ft.Page):
                     ),
                     padding=22,
                     border_radius=24,
-                    bgcolor="#101010cc",
+                    bgcolor="#101010dd",
                     border=ft.border.all(1, "#2a2a2a"),
                 )
 
@@ -221,9 +220,9 @@ def main(page: ft.Page):
     # --- INPUT ---
     search_field = ft.TextField(
         hint_text="Sök Pokémon...",
-        width=320,
+        width=340,
         border_radius=28,
-        bgcolor="#111111cc",
+        bgcolor="#0b0b0bcc",
         color="white",
         text_size=16,
         content_padding=16,
@@ -234,8 +233,8 @@ def main(page: ft.Page):
 
     search_button = ft.ElevatedButton(
         "SÖK",
-        width=320,
-        height=52,
+        width=340,
+        height=54,
         on_click=perform_search,
         style=ft.ButtonStyle(
             shape=ft.RoundedRectangleBorder(radius=28),
@@ -245,46 +244,49 @@ def main(page: ft.Page):
         ),
     )
 
-    # --- HERO ---
+    # --- HERO MED RIKTIG BAKGRUND ---
     hero = ft.Container(
-        height=520,
-        bgcolor="#000000",
+        height=560,
         content=ft.Stack(
-            [
-                ft.Column(
-                    [
-                        ft.Image(
-                            src="assets/icon.png",
-                            width=720,
-                            height=720,
-                            opacity=0.06,
-                            fit="contain",
-                        )
-                    ],
-                    alignment="center",
-                    horizontal_alignment="center",
-                    expand=True,
+            controls=[
+                # Bakgrundsbild
+                ft.Image(
+                    src="assets/bg_groudon.png",
+                    width=1200,
+                    height=560,
+                    fit="cover",
                 ),
-                ft.Column(
-                    [
-                        ft.Text(
-                            "Shinydex",
-                            size=34,
-                            weight="bold",
-                            color="white",
-                            text_align="center",
-                        ),
-                        search_field,
-                        search_button,
-                    ],
-                    alignment="center",
-                    horizontal_alignment="center",
-                    spacing=20,
-                    expand=True,
+
+                # Mörk overlay ovanpå bilden
+                ft.Container(
+                    width=1200,
+                    height=560,
+                    bgcolor="#000000aa",
                 ),
-            ],
-            expand=True,
-        ),
+
+                # Innehåll i mitten
+                ft.Container(
+                    width=1200,
+                    height=560,
+                    content=ft.Column(
+                        controls=[
+                            ft.Text(
+                                "Shinydex",
+                                size=36,
+                                weight="bold",
+                                color="white",
+                                text_align="center",
+                            ),
+                            search_field,
+                            search_button,
+                        ],
+                        alignment="center",
+                        horizontal_alignment="center",
+                        spacing=22,
+                    ),
+                ),
+            ]
+        )
     )
 
     results_section = ft.Container(
@@ -296,6 +298,5 @@ def main(page: ft.Page):
         hero,
         results_section,
     )
-
 
 app = ft.run(main, export_asgi_app=True)
