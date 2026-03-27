@@ -118,8 +118,8 @@ def main(page: ft.Page):
                             controls=[
                                 ft.Image(
                                     src=normal_img_url,
-                                    width=160,
-                                    height=160,
+                                    width=320,
+                                    height=320,
                                     fit=ft.BoxFit.CONTAIN,
                                 ),
                                 build_image_label("Normal", "#bcbcbc"),
@@ -138,8 +138,8 @@ def main(page: ft.Page):
                             controls=[
                                 ft.Image(
                                     src=shiny_img_url,
-                                    width=160,
-                                    height=160,
+                                    width=320,
+                                    height=320,
                                     fit=ft.BoxFit.CONTAIN,
                                 ),
                                 build_image_label("Shiny ✨", "#ffd966"),
@@ -209,8 +209,8 @@ def main(page: ft.Page):
                             controls=[
                                 ft.Image(
                                     src=normal_img_url,
-                                    width=170,
-                                    height=150,
+                                    width=320,
+                                    height=320,
                                     fit=ft.BoxFit.CONTAIN,
                                 ),
                                 build_image_label("Normal", "#bcbcbc"),
@@ -418,4 +418,4 @@ def main(page: ft.Page):
 app = ft.run(main, export_asgi_app=True)
 
 # LOKAL
-# ft.app(target=main, assets_dir="assets")
+#ft.app(target=main, assets_dir="assets")
