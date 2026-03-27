@@ -33,7 +33,7 @@ def main(page: ft.Page):
                 weight=ft.FontWeight.BOLD,
             ),
             padding=ft.padding.symmetric(horizontal=12, vertical=8),
-            bgcolor="#171717cc",
+            bgcolor="#000000",
             border_radius=18,
             border=ft.border.all(1, "#2a2a2a"),
         )
@@ -47,7 +47,7 @@ def main(page: ft.Page):
                 weight=ft.FontWeight.BOLD,
             ),
             padding=ft.padding.symmetric(horizontal=14, vertical=9),
-            bgcolor="#2a1010cc",
+            bgcolor="#000000",
             border_radius=18,
             border=ft.border.all(1, "#4a1d1d"),
         )
@@ -63,7 +63,7 @@ def main(page: ft.Page):
     def build_divider():
         return ft.Container(
             height=1,
-            bgcolor="#1f1f1f",
+            bgcolor="#000000",
             border_radius=10,
         )
 
@@ -95,21 +95,7 @@ def main(page: ft.Page):
                     spacing=2,
                     expand=True,
                 ),
-                ft.Container(
-                    content=ft.Text(
-                        "✨ Shiny" if shiny_exists else "—",
-                        size=11,
-                        color="#ffd966" if shiny_exists else "#aaaaaa",
-                        weight=ft.FontWeight.BOLD,
-                    ),
-                    padding=ft.padding.symmetric(horizontal=12, vertical=8),
-                    bgcolor="#2a2412cc" if shiny_exists else "#151515cc",
-                    border_radius=18,
-                    border=ft.border.all(
-                        1,
-                        "#5a4a1a" if shiny_exists else "#2a2a2a",
-                    ),
-                ),
+                
             ],
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
@@ -122,56 +108,49 @@ def main(page: ft.Page):
             )
 
             image_section = ft.Row(
+    controls=[
+        ft.Container(
+            width=220,
+            padding=12,
+            bgcolor="#141414cc",
+            border_radius=20,
+            content=ft.Column(
                 controls=[
-                    ft.Container(
-                        expand=True,
-                        padding=12,
-                        bgcolor="#141414cc",
-                        border_radius=20,
-                        content=ft.Column(
-                            controls=[
-                                ft.Container(
-                                    alignment=ft.Alignment.CENTER,
-                                    content=ft.Image(
-                                        src=normal_img_url,
-                                        width=165,
-                                        height=165,
-                                        fit=ft.BoxFit.CONTAIN,
-                                    ),
-                                ),
-                                build_image_label("Normal", "#bcbcbc"),
-                            ],
-                            spacing=6,
-                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                        ),
+                    ft.Image(
+                        src=normal_img_url,
+                        width=165,
+                        height=165,
+                        fit=ft.BoxFit.CONTAIN,
                     ),
-                    ft.Container(
-                        expand=True,
-                        padding=12,
-                        bgcolor="#1c1810cc",
-                        border_radius=20,
-                        content=ft.Column(
-                            controls=[
-                                ft.Container(
-                                    alignment=ft.Alignment.CENTER,
-                                    content=ft.Image(
-                                        src=shiny_img_url,
-                                        width=165,
-                                        height=165,
-                                        fit=ft.BoxFit.CONTAIN,
-                                    ),
-                                ),
-                                build_image_label("Shiny ✨", "#ffd966"),
-                            ],
-                            spacing=6,
-                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                        ),
-                    ),
+                    build_image_label("Normal", "#bcbcbc"),
                 ],
-                spacing=14,
-                alignment=ft.MainAxisAlignment.CENTER,
-                wrap=True,
-            )
+                spacing=6,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            ),
+        ),
+        ft.Container(
+            width=220,
+            padding=12,
+            bgcolor="#1c1810cc",
+            border_radius=20,
+            content=ft.Column(
+                controls=[
+                    ft.Image(
+                        src=shiny_img_url,
+                        width=165,
+                        height=165,
+                        fit=ft.BoxFit.CONTAIN,
+                    ),
+                    build_image_label("Shiny ✨", "#ffd966"),
+                ],
+                spacing=6,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            ),
+        ),
+    ],
+    spacing=14,
+    alignment=ft.MainAxisAlignment.CENTER,
+)
 
             badges = []
             if shiny_status.get("found_wild"):
@@ -218,31 +197,29 @@ def main(page: ft.Page):
             )
         else:
             image_section = ft.Row(
+    controls=[
+        ft.Container(
+            width=260,
+            padding=12,
+            bgcolor="#141414cc",
+            border_radius=20,
+            content=ft.Column(
                 controls=[
-                    ft.Container(
-                        padding=12,
-                        bgcolor="#141414cc",
-                        border_radius=20,
-                        content=ft.Column(
-                            controls=[
-                                ft.Container(
-                                    alignment=ft.Alignment.CENTER,
-                                    content=ft.Image(
-                                        src=normal_img_url,
-                                        width=220,
-                                        height=180,
-                                        fit=ft.BoxFit.CONTAIN,
-                                    ),
-                                ),
-                                build_image_label("Normal", "#bcbcbc"),
-                            ],
-                            spacing=6,
-                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                        ),
-                    )
+                    ft.Image(
+                        src=normal_img_url,
+                        width=220,
+                        height=180,
+                        fit=ft.BoxFit.CONTAIN,
+                    ),
+                    build_image_label("Normal", "#bcbcbc"),
                 ],
-                alignment=ft.MainAxisAlignment.CENTER,
-            )
+                spacing=6,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            ),
+        )
+    ],
+    alignment=ft.MainAxisAlignment.CENTER,
+)
 
             card_body = ft.Column(
                 controls=[
@@ -262,7 +239,7 @@ def main(page: ft.Page):
             content=card_body,
             padding=24,
             border_radius=28,
-            bgcolor="#0d0d0dde",
+            bgcolor="#000000",
             border=ft.border.all(1, "#202020"),
         )
 
@@ -346,7 +323,7 @@ def main(page: ft.Page):
         height=56,
         border=ft.InputBorder.OUTLINE,
         border_radius=28,
-        bgcolor="#111111cc",
+        bgcolor="#000000",
         color="white",
         text_size=16,
         content_padding=ft.padding.symmetric(horizontal=20, vertical=16),
@@ -383,10 +360,7 @@ def main(page: ft.Page):
                 ft.Container(height=8),
                 ft.Container(
                     content=search_field,
-                    padding=8,
-                    bgcolor="#00000055",
-                    border_radius=36,
-                    border=ft.border.all(1, "#ffffff18"),
+                    
                 ),
                 ft.Container(height=6),
                 ft.Row(
@@ -438,5 +412,8 @@ def main(page: ft.Page):
     load_data()
     page.update()
 
-
+#WEB
 app = ft.run(main, export_asgi_app=True)
+
+#LOKAL
+#ft.app(target=main, assets_dir="assets")
